@@ -75,38 +75,4 @@ svg.append('text')
   .style('font-size', '20px')
   .text('PIB en 2018')
 
-// leg.append("rect")
-//   .attr("width",15)
-//   .attr("height",15)
-//   .attr("fill",function (d,i){
-//     return colors[i];
-//   });
-// leg.append("text")
-//   .attr("x", 25)
-//   .attr('y', 12)
-//   .attr("fill","black")
-//   .style("font-size","12px")
-//     .text(function(d,i) {
-//         return d.data.nom;
-//     });
-
-
-
-// grp.append('text')
-//     .attr('transform', d => {
-//       d.innerRadius = 180
-//       d.outerRadius = 360
-
-//       return `translate(${arc.centroid(d)})`
-//     })
-//     .attr({
-//       'fill': 'white',
-//       'text-anchor': 'middle',
-//       'font-size': '10'
-//     })
-//     .text((d) => {
-//       return d.data.nom
-//     })
-
-
 },{}]},{},[1]);
