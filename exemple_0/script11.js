@@ -1,75 +1,50 @@
+var tab_0=[30,150,27,34];
+var tab_1=[25,120,40,75];
+var tab_2=[40,110,80,76];
+var tab=[tab_0,tab_1,tab_2]
+var n=0;
+var couleurs=["blue","red","purple","olive"];
+var body=d3.select("body");
+var svg=body.append("svg");
+svg.attr({"width":"400px","height":"400px"})
+svg.style("border","1px solid black");
 
-const tab = [{"valeur": 18287000, "nom":"États-Unis"},{"valeur": 11285000, "nom":"Chine"},{"valeur": 4882000, "nom":"Japon"},{"valeur": 3909000, "nom":"Allemagne"},{"valeur": 3003000, "nom":"Royaume-Uni"},{"valeur":2935000, "nom":"France"}];
-const colors = ["green", "red", "brown", "blue", "purple", "olive"];
+var pieTab=d3.layout.pie();
+pieTab.value(function(d){
+        return d;
+    });
 
-const body = d3.select('body');
-const svg = body.append('svg');
-const pieTab = d3.layout.pie();
-const arc = d3.svg.arc();
+var arc=d3.svg.arc();
+arc.outerRadius(180);
 
-svg.attr({
-  "width": "1000px",
-  "height": "1000px",
-  "border": "1px solid black"
-});
-
-pieTab.value(d => {
-  return d.valeur
-})
-
-arc.outerRadius(180)
-
-const arcs = svg.selectAll('g.arcs')
-                .data(pieTab(tab))
-                .enter()
-                .append('g')
-                .attr('transform', 'translate(180, 300)')
-
-arcs.append('path')
-    .attr('fill', (d, index) => {
-      return colors[index]
+var grp=svg.append("g").attr("transform","translate(200,200)");
+var graph=grp.selectAll("path").data(pieTab(tab_0))
+graph.enter()
+  .append("path")
+  .attr("fill",function(d,i){
+      return(couleurs[i]);
     })
-    .attr('class', 'arcs')
-    .attr('d', arc)
+  .attr("d",arc)
+  .each(function(d){this._current=d;});
 
+function update(data){
+    graph.data(pieTab(data));
+    graph.transition().duration(750).attrTween("d", arcTween);
 
-const leg = svg.selectAll('g.legendes')
-                .data(pieTab(tab))
-                .enter()
-                .append('g')
-                .attr('class', 'legendes')
-                .attr('transform', (d, i) => {
-                  return `translate(400, ${100+30*i})`
-                })
+}
 
-leg.append('rect')
-  .attr({
-    'width': '20px',
-    'height': '20px'
-  })
-  .attr('fill', (d, i) => {
-    return colors[i]
-  })
+function arcTween(a) {
+  var i = d3.interpolate(this._current, a);
+  this._current = i(0);
+  return function(t) {
+    return arc(i(t));
+  };
+}
+setInterval(function() {
+  if (n==2){
+    n=-1;
+  }
+  n=n+1;
+  update(tab[n]);
+}, 3000);
 
-leg.append('text')
-  .attr({
-    'fill': 'black'
-  })
-  .attr("x", 25)
-  .attr('y', 12)
-  .style({
-    'font-size': '14px',
-  })
-  .text((d) => {
-    return d.data.nom
-  })
-
-svg.append('text')
-  .attr({
-    'fill': 'black',
-    'x': '200',
-    'y': '30',
-    'text-anchor': 'middle'
-  })
-  .style('font-size', '20px')
-  .text('PIB en 2018')
