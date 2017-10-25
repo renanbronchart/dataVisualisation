@@ -1,76 +1,82 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function () {
-  var body = d3.select('body');
-  d3.csv('donnees.csv', (data) => {
-    const scaleX = d3.scale
-                     .ordinal()
-                     .domain(data.map((d, i) => {return d.jour}))
-                     .rangeBands([30, 370])
+  let body = d3.select('body')
+  let dateFormat = d3.time.format('%d/%m/%Y')
 
-    const scaleY = d3.scale
-                     .linear()
-                     .domain([0, 54])
-                     .range([370, 30])
+  let scaleX = d3.time.scale().range([50, 870])
+  let scaleY = d3.scale.linear().range([570, 50])
 
-    const xAxe = d3.svg.axis()
-                       .scale(scaleX)
-                       .orient('bottom')
+  let xAxe = d3.svg
+                .axis()
+                .scale(scaleX)
+                .orient('bottom')
+  let yAxe = d3.svg
+                .axis()
+                .scale(scaleY)
+                .orient('left')
 
-    const yAxe = d3.svg.axis()
-                       .scale(scaleY)
-                       .orient('left')
+  let line = d3.svg
+                .line()
+                .x((d) => {
+                  return scaleX(d.date)
+                })
+                .y((d) => {
+                  return scaleY(d.close)
+                })
 
-    const svg = body.append('svg')
-    const titre = svg.append('text').attr({'x': '50', 'y': '20'})
+  let svg = body.append('svg')
 
-    svg.attr({'width': '400px', 'height': '400px'})
+  svg.attr({
+    'width': '900px',
+    'height': '600px'
+  })
+
+  d3.tsv('data.tsv', (data) => {
+    data.forEach((d) => {
+      d.date = dateFormat.parse(d.date)
+
+      d.close = +d.close
+    })
+
+    scaleX.domain(d3.extent(data, (d) => {
+      return d.date
+    }))
+
+    scaleY.domain(d3.extent(data, (d) => {
+      return d.close
+    }))
 
     svg.append('g')
-      .style({
-        'font-size': '9px',
-        'font-family': 'sans-serif'
-      })
-      .attr({
-        'fill': 'none',
-        'stroke': 'black',
-        'transform': 'translate(0, 370)'
-      })
-      .call(xAxe)
+        .style({
+          'font-size': '11px',
+          'font-family': 'sans-serif'
+        })
+        .attr({
+          'fill': 'none',
+          'stroke': 'black',
+          'transform': 'translate(0, 570)'
+        })
+        .call(xAxe)
 
     svg.append('g')
-      .style({
-        'font-size': '11px',
-        'font-family': 'sans-serif'
-      })
-      .attr({
-        'fill': 'none',
-        'stroke': 'black',
-        'transform': 'translate(30, 0)'
-      })
-      .call(yAxe)
+        .style({
+          'font-size': '11px',
+          'font-family': 'sans-serif'
+        })
+        .attr({
+          'fill': 'none',
+          'stroke': 'black',
+          'transform': 'translate(50, 0)'
+        })
+        .call(yAxe)
 
-      const params = svg.selectAll('rect')
-                        .data(data)
-
-      titre.text(`donnees CSV`)
-
-
-       params.enter()
-              .append('rect')
-              .attr('stroke', 'black')
-              .attr('width', (d, i) => {
-                return (340/data.length)
-              })
-              .attr('height', (d, i) => {
-                return (370 - scaleY(d.nbre_visiteurs))
-              })
-              .attr('fill', 'blue')
-              .attr('x', (d, i) => {
-                return (30+i*340/data.length)
-              })
-              .attr('y', (d, i) => {
-                return (scaleY(d.nbre_visiteurs))
-              })
+    svg.append('path')
+        .datum(data)
+        .attr({
+          'fill': 'none',
+          'stroke': 'black'
+        })
+        .attr('d', line)
 
   })
 })()
