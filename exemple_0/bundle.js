@@ -2,6 +2,9 @@
 (function () {
   const body = d3.select('body')
   const svg = body.append('svg')
+  const title = d3.select('.title__department')
+
+  title.style('opacity', '0')
 
   svg.attrs({
     width: 600,
@@ -25,14 +28,24 @@
         .attr('fill', 'black')
         .attr('stroke', 'white')
         .attr('d', path)
-        .on('mouseover', function () {
-          d3.select(this).attr('fill', 'red')
-          setTimeout(() => {
-            d3.select(this).attr('fill', 'black')
-          }, 150)
+        .on('mouseover', function (d) {
+          d3.select(this)
+            .attr('fill', 'red')
+
+          title.transition()
+                .duration(300)
+                .style("opacity", .9)
+
+          title.text(`Département: ${d.properties.NOM_DEPT}`)
         })
-        .on('click', function () {
-          d3.select(this).attr('fill', 'red')
+        .on('mouseout', function () {
+          d3.select(this)
+            .attr('fill', 'black')
+
+          title.transition()
+                .duration(500)
+                .style("opacity", 0)
+          title.text('')
         })
   })
 
