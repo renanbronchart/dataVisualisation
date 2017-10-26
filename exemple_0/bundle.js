@@ -33,12 +33,12 @@
         })
 
     d3.csv('population.csv', (csv) => {
-      const quantile = d3.scaleQuantile().domain([0, d3.max(csv, (e) => +e.POP)]).range(d3.range(9))
+      const quantile = d3.scaleQuantile().domain([0, d3.max(csv, (e) => +e.POP)]).range(d3.range(17))
 
       csv.forEach((e, i) => {
         console.log(e)
         d3.select(`#d${e.CODE_DEPT}`)
-          .attr("class", (d) => `q${quantile(+e.POP)}-9`)
+          .attr("class", (d) => `q${quantile(+e.POP)}-17`)
       })
     })
         // .on('mouseover', function (d) {
