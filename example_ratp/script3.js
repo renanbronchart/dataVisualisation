@@ -21,10 +21,13 @@ function drawMap (error, metropoles) {
 
 
   //HeatMap
-  var geoData = [];
+  let geoData = [];
+  const maxValue = d3.max(metropoles, function(d) { return +d.fields.population; })
+
+  console.log(maxValue);
 
   (metropoles).forEach(function (d) {
-    geoData.push([d.fields.geo_point_2d[0], d.fields.geo_point_2d[1], d.fields.population]);
+    geoData.push([d.fields.geo_point_2d[0], d.fields.geo_point_2d[1], ((d.fields.population*500)/maxValue)]);
   })
   var heat = L.heatLayer(geoData,{
       radius: 10,
@@ -32,7 +35,6 @@ function drawMap (error, metropoles) {
       maxZoom: 10,
       minZoom: 20,
       max: 2,
-      minOpacity: 0.1,
-      gradient: {0.5: 'blue', 0.4: 'lime', 1: 'red'}
+      minOpacity: 0.1
   }).addTo(map);
 }
