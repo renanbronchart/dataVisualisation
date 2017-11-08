@@ -73,7 +73,7 @@ function drawCharts (error, metropoles) {
         alert(e.message);
     }
 
-    initLocation();
+    // initLocation();
 
     // map.setView([31.75, 110], 4);
     // mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
@@ -112,6 +112,8 @@ function drawCharts (error, metropoles) {
 
   dcCharts.forEach(function (dcChart) {
     dcChart.on("filtered", function (chart, filter) {
+      console.log(chart, 'chart')
+      console.log(filter, 'filter')
         map.eachLayer(function (layer) {
           map.removeLayer(layer)
         });
