@@ -65,10 +65,41 @@ function makeGraphs(error, recordsJson) {
 
   dcCharts.forEach(function (dcChart) {
     dcChart.on("filtered", function (chart, filter) {
-      map.eachLayer(function (layer) {
-        map.removeLayer(layer)
-      });
-      drawMap(allDim);
+
+      var transitionPoints = new Promise(
+        // La fonction de résolution est appelée avec la capacité de
+        // tenir ou de rompre la promesse
+        function(resolve, reject) {
+          d3.select('.leaflet-objects-pane')
+            .transition()
+            .duration(700)
+            .style("opacity", "0")
+            .transition()
+            .duration(500)
+            .style("opacity","1")
+
+
+          setTimeout(function () {
+            resolve('la promesse marche');
+          }, 550);
+        }
+      );
+
+      transitionPoints.then(
+         // On affiche un message avec la valeur
+        function (val) {
+          console.log(val);
+
+          map.eachLayer(function (layer) {
+            map.removeLayer(layer)
+          });
+
+           drawMap(allDim);
+        }).catch(
+           // Promesse rejetée
+          function() {
+            console.log("promesse rompue");
+          });
     });
   })
 

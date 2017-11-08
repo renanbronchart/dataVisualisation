@@ -37,3 +37,7 @@
   width: 70%;
   height: 90%;
 }
+
+.leaflet-tile-pane {
+  z-index: -1;
+}

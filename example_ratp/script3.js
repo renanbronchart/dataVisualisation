@@ -95,7 +95,7 @@ function drawCharts (error, metropoles) {
     (metropoles).forEach(function (d) {
       geoData.push([d.fields.geo_point_2d[0], d.fields.geo_point_2d[1], ((d.fields.population)/114.2)]);
     })
-    var heat = L.heatLayer(geoData,{
+    var heat = L.heatLayer(geoData, {
         radius: 10,
         blur: 15,
         maxZoom: 10,
