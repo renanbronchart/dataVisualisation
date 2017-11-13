@@ -11,11 +11,52 @@ var svg = d3.select(map.getPanes().overlayPane).append("svg");
 var stationsGroup = svg.append("g").attr("class", "leaflet-zoom-hide");
 
 var featureStation;
+var featurePointStation;
 
 var transform = d3.geo.transform({point: projectPoint});
 var path = d3.geo.path().projection(transform);
 
 var rootWidth, previousWidth;
+
+
+
+// var toPoint = d3.svg.append("circle")
+//   .attr("cx", function (d){ return applyLatLngToLayer(d).x })
+//   .attr("cy", function (d){ return applyLatLngToLayer(d).y });
+
+
+
+function applyLatLngToLayer(d) {
+  var point = map.latLngToLayerPoint(new L.LatLng(d[1], d[0]));
+
+  console.log(point)
+  return point;
+  // console.log(point.x)
+
+  // this.stream.point(point.x, point.y);
+
+    // var y = d[1]
+    // var x = d[0]
+
+    // return map.latLngToLayerPoint(new L.LatLng(y, x))
+}
+
+
+  // featurePointStation = stationsGroup
+  //   .selectAll(".centroid")
+  //   .data(centroids)
+  //   .enter()
+  //   .append("circle")
+  //   .attr("class", "centroid")
+  //   .attr("fill", "red")
+  //   .attr("stroke", "red")
+  //   .attr("r", 10)
+  //   .attr("d", path.pointRadius(function(d) {
+  //         return
+  //       }))
+  //   .attr("cx", function (d){ return d[0]; })
+  //   .attr("cy", function (d){ return d[1]; });
+
 
 // var div = d3.select("#rightbox");
 
@@ -31,56 +72,62 @@ function ready(error, stations, lines) {
     .domain([0, d3.max(stations.features, function(d) { return +d.properties.population; })])
     .range([2, 50]);
 
+
+
+
+
+
+
   featureStation = stationsGroup.selectAll(".station")
     .data(stations.features)
     .enter()
     .append("path")
     .attr("class", "station")
-    // .attr("d", path.pointRadius(function(d) { return radius(d.properties.population) }))
+    .attr("d", path.pointRadius(function(d) {
+      console.log(d, 'stations')
+      return radius(d.properties.population) }))
     .style("fill", "gray")
     .style('stroke', 'white')
 
-  var centroids = stations.features.map((feature) => {
+  // var centroids = stations.features.map((feature) => {
 
-    return path.centroid(feature);
-  });
+  //   return path.centroid(feature);
+  // });
+  var stationsFeatures = stations.features;
+  var newStations = [...stationsFeatures];
+
+
+  var centroids = newStations.map((feature) => {
+    let newFeature = Object.assign({}, feature);
+    let newCoordinates = [...feature.geometry.coordinates]
+    let geom = Object.assign({}, feature['geometry'])
+
+    geom.type = 'Point';
+    newCoordinates = feature.properties.geo_point_2d.reverse();
+
+    newFeature.geometry = geom;
+    newFeature.geometry.coordinates = newCoordinates;
+
+
+    return newFeature;
+  })
+
+  console.log(centroids, 'centroids')
 
   var featurePointStation = stationsGroup
-    .selectAll(".centroid")
-    .data(centroids)
-    .enter()
-    .append("circle")
-    .attr("class", "centroid")
-    .attr("fill", "red")
-    .attr("stroke", "red")
-    .attr("r", 10)
-    .attr("cx", function (d){ return d[0]; })
-    .attr("cy", function (d){ return d[1]; });
+      .selectAll(".centroids")
+      .data(centroids)
+      .enter()
+      .append("path")
+      .attr("class", "centroids")
+      .attr("d", path.pointRadius(function(d) {
+        console.log(d, 'centroids')
+        return radius(d.properties.population) }))
+      .style("fill", "red")
+      .style("opacity", "1");
 
 
 
-
-  function getBoundingBoxCenter (selection) {
-    // get the DOM element from a D3 selection
-    // you could also use "this" inside .each()
-    var element = selection.node();
-    // use the native SVG interface to get the bounding box
-    var bbox = element.getBBox();
-    // return the center of the bounding box
-    return [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
-  }
-
-  // console.log(centroids, 'centroid')
-  // svg.append("g")
-  //   .selectAll(".centroid")
-  //   .data(centroids)
-  //   .enter().append("circle")
-  //     .attr("class", "centroid")
-  //     .attr("fill", 'white')
-  //     .attr("stroke", 'white')
-  //     .attr("r", '10')
-  //     .attr("cx", function (d){ return d[0]; })
-  //     .attr("cy", function (d){ return d[1]; });
 
   map.on("viewreset", reset);
   reset();
@@ -108,7 +155,14 @@ function ready(error, stations, lines) {
       radius.range([2, 50 * (newWidth / rootWidth)]);
     }
 
-    featureStation.attr("d", path.pointRadius(function(d) { return radius(d.properties.population) }));
+    featureStation.attr("d", path.pointRadius(function(d) {
+      return radius(50)
+    }));
+
+    featurePointStation.attr("d", path.pointRadius(function(d) {
+      return radius(1200)
+    }));
+
     previousWidth = newWidth;
 
 
@@ -118,6 +172,7 @@ function ready(error, stations, lines) {
 // Use Leaflet to implement a D3 geometric transformation.
 function projectPoint(x, y) {
   var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+
   this.stream.point(point.x, point.y);
 }
 

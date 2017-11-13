@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "watchify script5.js -o bundle.js",
+    "start": "watchify script6.js -o bundle.js",
     "dev": "watchify script2.js -o bundle.js"
   },
   "author": "",
