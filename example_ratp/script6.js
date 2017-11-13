@@ -78,16 +78,16 @@ function ready(error, stations, lines) {
 
 
 
-  featureStation = stationsGroup.selectAll(".station")
-    .data(stations.features)
-    .enter()
-    .append("path")
-    .attr("class", "station")
-    .attr("d", path.pointRadius(function(d) {
-      console.log(d, 'stations')
-      return radius(d.properties.population) }))
-    .style("fill", "gray")
-    .style('stroke', 'white')
+  // featureStation = stationsGroup.selectAll(".station")
+  //   .data(stations.features)
+  //   .enter()
+  //   .append("path")
+  //   .attr("class", "station")
+  //   .attr("d", path.pointRadius(function(d) {
+  //     console.log(d, 'stations')
+  //     return radius(d.properties.population) }))
+  //   .style("fill", "gray")
+  //   .style('stroke', 'white')
 
   // var centroids = stations.features.map((feature) => {
 
@@ -155,12 +155,12 @@ function ready(error, stations, lines) {
       radius.range([2, 50 * (newWidth / rootWidth)]);
     }
 
-    featureStation.attr("d", path.pointRadius(function(d) {
-      return radius(50)
-    }));
+    // featureStation.attr("d", path.pointRadius(function(d) {
+    //   return radius(50)
+    // }));
 
     featurePointStation.attr("d", path.pointRadius(function(d) {
-      return radius(1200)
+      return radius(d.properties.population)
     }));
 
     previousWidth = newWidth;
