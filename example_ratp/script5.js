@@ -4,8 +4,25 @@ queue()
 
 var map = L.map('map', {
   center: [48.853, 2.333],
-  zoom: 14
+  zoom: 10
 });
+
+
+
+var svg = d3.select(map.getPanes().overlayPane).append("svg");
+
+var commercesGroup = svg.append("g").attr("class", "leaflet-zoom-hide");
+
+var featureCommerces;
+
+var transform = d3.geo.transform({point: projectPoint});
+var path = d3.geo.path().projection(transform);
+
+var rootWidth, previousWidth;
+
+
+
+
 
 function makeGraphs(error, recordsJson) {
   //Clean data
@@ -88,7 +105,6 @@ function makeGraphs(error, recordsJson) {
       transitionPoints.then(
          // On affiche un message avec la valeur
         function (val) {
-          console.log(val);
 
           map.eachLayer(function (layer) {
             map.removeLayer(layer)
@@ -111,33 +127,66 @@ var drawMap = function (allDim) {
   // map.setView([31.75, 110], 4);
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom: 16,
-      minZoom: 10,
+      maxZoom: 30,
+      minZoom: 8,
       id: 'mapbox.streets',
       accessToken: 'sk.eyJ1IjoicmVuYW5icm9uY2hhcnQiLCJhIjoiY2o5OW84enp2MHoyOTMzbndla3cyN3hrcCJ9.DdB659aMvccAu0B6ag8aJA'
   }).addTo(map);
 
   var allDimTop = allDim.top(Infinity);
 
+
+
+  var radius = d3.scale.linear()
+    .domain([0, d3.max(allDimTop, function(d) { return +d.fields.population; })])
+    .range([2, 50]);
+
+
+
+
   const maxValue = d3.max(allDimTop, function(d) { return +d.fields.population })
 
   //HeatMap
   var geoData = [];
 
-  // a voir
+  // a voir si toujours utiles
   allDimTop.forEach(function (d) {
-    // console.log(d)
     geoData.push([d.fields.geo_point_2d[0], d.fields.geo_point_2d[1], ((d.fields.population)/maxValue)]);
   })
+
+
+
+
+
+  featureCommerces = commercesGroup.selectAll(".commerces")
+    .data(allDimTop)
+    .enter()
+    .append("path")
+    .attr("class", "commerces")
+    .attr("d", path.pointRadius(function(d) {
+      return radius(Math.floor((d.fields.population)) * 100)
+    }))
+    .style("fill", "black")
+    .style("z-index", function(d) { return Math.floor((d.fields.population)); })
+
+
 
   var heat = L.heatLayer(geoData,{
       radius: 10,
       blur: 15,
-      maxZoom: 10,
-      minZoom: 20,
+      maxZoom: 8,
+      minZoom: 25,
       // max: 2,
       minOpacity: 0.5
   }).addTo(map);
 
 };
+
+
+// Use Leaflet to implement a D3 geometric transformation.
+function projectPoint(x, y) {
+  var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+
+  this.stream.point(point.x, point.y);
+}
 
