@@ -122,7 +122,7 @@ function ready(error, stations, lines) {
       .attr("class", "centroids")
       .attr("d", path.pointRadius(function(d) {
         console.log(d, 'centroids')
-        return radius(d.properties.population) }))
+        return radius(500) }))
       .style("fill", "red")
       .style("opacity", "1");
 
@@ -160,7 +160,7 @@ function ready(error, stations, lines) {
     // }));
 
     featurePointStation.attr("d", path.pointRadius(function(d) {
-      return radius(d.properties.population)
+      return radius(500)
     }));
 
     previousWidth = newWidth;
